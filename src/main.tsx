@@ -4,7 +4,7 @@ import App from './App';
 import './index.css';
 
 // Register Service Worker for offline PWA functionality
-if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+if (import.meta.env.VITE_STANDALONE_APP !== 'true' && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((err) => {
       console.warn('Service Worker registration skipped or failed:', err);
