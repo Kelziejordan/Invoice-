@@ -81,6 +81,12 @@ export const InvoiceBuddyModal: React.FC<InvoiceBuddyModalProps> = ({
   useEffect(() => {
     if (isStandaloneApp) {
       llmClient.setModelUnavailable(true);
+      setLlmStatus({
+        state: 'ready',
+        statusMessage: 'Deterministic offline invoice parser active. Neural model disabled.',
+        modelName: 'Deterministic local engine',
+        device: 'On-device rules'
+      });
       return;
     }
     if (isOpen && (llmStatus.state === 'idle' || llmStatus.state === 'error')) {
@@ -288,7 +294,7 @@ export const InvoiceBuddyModal: React.FC<InvoiceBuddyModalProps> = ({
         <div className="border-b border-purple-100 bg-purple-50/50 px-4 py-2 text-xs flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-purple-800">
             <Cpu size={13} className="text-purple-600" aria-hidden="true" />
-            <span className="font-semibold">Local AI Model:</span>
+            <span className="font-semibold">{isStandaloneApp ? 'Offline invoice parser:' : 'Local AI Model:'}</span>
             <span>{isStandaloneApp ? 'Deterministic local engine' : llmStatus.modelName}</span>
             <span className="text-[11px] text-purple-600">({llmStatus.state})</span>
           </div>
