@@ -74,12 +74,19 @@ export const InvoiceBuddyModal: React.FC<InvoiceBuddyModalProps> = ({
     return () => unsub();
   }, []);
 
-  // Automatically trigger local LLM model loading/downloading when Invoice Buddy opens
+  // The standalone APK uses the bundled deterministic parser. It must never
+  // attempt to download neural model weights or make a network request.
+  const isStandaloneApp = import.meta.env.VITE_STANDALONE_APP === 'true';
+
   useEffect(() => {
+    if (isStandaloneApp) {
+      llmClient.setModelUnavailable(true);
+      return;
+    }
     if (isOpen && (llmStatus.state === 'idle' || llmStatus.state === 'error')) {
       llmClient.initializeModel();
     }
-  }, [isOpen, llmStatus.state]);
+  }, [isOpen, llmStatus.state, isStandaloneApp]);
 
   // Recover unfinished conversation & draft from IndexedDB
   useEffect(() => {
@@ -250,7 +257,7 @@ export const InvoiceBuddyModal: React.FC<InvoiceBuddyModalProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-slate-500">
-                100% On-Device, Offline, Multi-turn Invoice Extractor
+                {isStandaloneApp ? 'Offline, on-device invoice assistant. No model download.' : '100% On-Device, Offline, Multi-turn Invoice Extractor'}
               </p>
             </div>
           </div>
@@ -282,7 +289,7 @@ export const InvoiceBuddyModal: React.FC<InvoiceBuddyModalProps> = ({
           <div className="flex items-center gap-1.5 text-purple-800">
             <Cpu size={13} className="text-purple-600" aria-hidden="true" />
             <span className="font-semibold">Local AI Model:</span>
-            <span>{llmStatus.modelName}</span>
+            <span>{isStandaloneApp ? 'Deterministic local engine' : llmStatus.modelName}</span>
             <span className="text-[11px] text-purple-600">({llmStatus.state})</span>
           </div>
 
@@ -309,7 +316,7 @@ export const InvoiceBuddyModal: React.FC<InvoiceBuddyModalProps> = ({
             </span>
           )}
 
-          {llmStatus.state === 'error' && (
+          {!isStandaloneApp && llmStatus.state === 'error' && (
             <button
               type="button"
               onClick={handleWarmup}
