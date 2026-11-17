@@ -4,7 +4,6 @@ const config: CapacitorConfig = {
   appId: 'ca.kelseaziegler.invoicestudio',
   appName: 'Invoice Studio 2',
   webDir: 'dist',
-  bundledWebRuntime: false,
   android: {
     allowMixedContent: false
   }
