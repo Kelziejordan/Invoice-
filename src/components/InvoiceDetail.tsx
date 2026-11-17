@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { Printer } from '@capgo/capacitor-printer';
 import { Invoice, InvoiceStatus, BusinessProfile } from '../types';
 import { formatCurrency } from '../utils/calc';
 import { ArrowLeft, Printer, CheckCircle, Clock, XCircle, Send, Edit3 } from 'lucide-react';
@@ -30,8 +32,18 @@ export const InvoiceDetail: React.FC<InvoiceDetailProps> = ({
     new Date().toISOString().split('T')[0]
   );
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      window.print();
+      return;
+    }
+
+    try {
+      await Printer.printWebView({ name: `Invoice ${invoice.invoiceNumber}` });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      window.alert(`Unable to open Android print / Save as PDF: ${message}`);
+    }
   };
 
   const handleRecordPayment = async () => {
