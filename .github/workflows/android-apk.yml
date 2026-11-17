@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Run unit and acceptance tests
+        run: npm test
+
+      - name: Type-check application
+        run: npm run lint
+
       - name: Build standalone web assets
         run: npm run build
         env:
